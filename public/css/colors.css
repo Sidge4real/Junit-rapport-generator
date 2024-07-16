@@ -1,0 +1,11 @@
+:root {
+    /* status colors */
+    --color-failed: rgba(255, 99, 132, 0.7);
+    --color-passed: rgba(144, 238, 144, 0.7);
+    --color-skipped: rgba(255, 159, 64, 0.7);
+    --color-expected-failures: rgba(210, 180, 140, 0.7);
+    --color-unexpected-passes: rgba(216, 191, 216, 0.7);
+    --color-errors: rgba(255, 192, 203, 0.7);
+    --color-reruns: rgba(173, 216, 230, 0.7);
+    --color-no-status: rgba(255, 165, 0, 0.7)
+}

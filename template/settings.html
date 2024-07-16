@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Settings</title>
+</head>
+<body>
+    <h1>Settings</h1>
+    <form id="logs-dir-form" method="POST" action="/update-logs-dir">
+        <ul>
+            <li>
+                <label for="logs-dir-input">XML reports directory:</label>
+                <input type="text" id="logs-dir-input" name="new_logs_dir" value="{{ logs_dir }}" required />
+            </li>
+            <li>
+                <label for="logs-dir-input">HTML reports directory:</label>
+                <input type="text" id="logs-dir-input" name="new_logs_dir" value="{{ reports_dir }}" required />
+            </li>
+        </ul>
+        <button type="submit">Update</button>
+    </form>
+</body>
+</html>

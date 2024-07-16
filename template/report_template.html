@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title id="head-title">Overzicht</title>
+    <link href="public/css/style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <h1 id="title"></h1>
+    <p>Report generated on {{ generated_at }}</p>
+    <div class="summary">
+        <div class="summary__data">
+            <h2>Summary</h2>
+            <div class="additional-summary prefix"></div>
+            <p class="run-count">{{ amount_of_tests }} test took <span class="total-duration">{{ total_duration }}</span>s.</p>
+            <!-- pie chart -->
+            <div style="height: 200px; width: 600px; margin: 10px;">
+                <canvas id="myPieChart" width="100" height="100"></canvas>
+            </div>
+            <div class="summary__spacer"></div>
+            <!-- controls of the table -->
+            <div class="controls">
+                <!-- filter boxes -->
+                <div class="filters">
+                    <input checked="true" class="filter" name="filter_checkbox" type="checkbox"
+                        filter_status="failed" {% if count_failed==0 %}disabled{% endif %} />
+                    <span class="colored failed">{{ count_failed }} Failed,</span>
+                    <input checked="true" class="filter" name="filter_checkbox" type="checkbox"
+                    filter_status="passed" {% if count_passed==0 %}disabled{% endif %} />
+                    <span class="colored passed">{{ count_passed }} Passed,</span>
+                    <input checked="true" class="filter" name="filter_checkbox" type="checkbox"
+                    filter_status="skipped" {% if count_skipped==0 %}disabled{% endif %} />
+                    <span class="colored skipped">{{ count_skipped }} Skipped,</span>
+                    <input checked="true" class="filter" name="filter_checkbox" type="checkbox"
+                        filter_status="expected failures" disabled />
+                    <span class="colored expected failures">{{count_expected_failures}} Expected failures,</span>
+                    <input checked="true" class="filter" name="filter_checkbox" type="checkbox"
+                        filter_status="unexpected passes" disabled />
+                    <span class="colored unexpected passes">{{count_unexpected_passes}} Unexpected passes,</span>
+                    <input checked="true" class="filter" name="filter_checkbox" type="checkbox" filter_status="errors"
+                        disabled />
+                    <span class="colored error">{{count_errors}} Errors,</span>
+                    <input checked="true" class="filter" name="filter_checkbox" type="checkbox" filter_status="reruns"
+                        disabled />
+                    <span class="colored rerun">{{count_reruns}} Reruns</span>
+                </div>
+                <!-- hide/show all buttons -->
+                <div class="collapse">
+                    <button id="show_all_details">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details">
+                        Hide all details
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="additional-summary summary"></div>
+        <div class="additional-summary postfix"></div>
+    </div>
+    <!-- table -->
+    <table id="results-table">
+        <!-- labels -->
+        <thead id="results-table-head">
+            <tr>
+                <th data-column-type="Scenario" data-column-name="scenario">
+                    Scenario
+                </th>
+                <th data-column-type="duration" data-column-name="duration">
+                    Duration
+                </th>
+                <th data-column-type="result" data-column-name="Results">
+                    Result
+                </th>
+            </tr>
+        </thead>
+        <!-- data -->
+        <tbody id="results-table-body">
+            {% for i in range(0, data|length) %} {% set row = data[i] %}
+            <!-- main row -->
+            <tr class="row click-to-open main-row row-{{ i }}" data-results="{{ row['Results'] }}" >
+                <td class="underlined {{row['Results']|lower}}" colspan="1">{{ row["scenario"] }}</td>
+                <td colspan="1"><span class="total-duration">{{ row["duration"] }}</span>s</td>
+                <td class="colored {{row['Results']|lower}}" colspan="1">{{ row["Results"] }}</td>
+            </tr>
+            <!-- detail rows -->
+            {% for part in row["log"] %}
+            <tr class="row hidden detail-row row-{{ i }}" data-results="{{ row['Results'] }}">
+                {% if not part["End"] %} {% if part["is_main_content"] %}
+                <td class="first_word" colspan="1">{{ part["Step"] }}</td>
+                {% elif part["include_scenario_word"] %}
+                <td class="scenario_word" colspan="1">{{ part["Step"] }}</td>
+                {% else %}
+                <td colspan="1">{{ part["Step"] }}</td>
+                {% endif %}
+                <td colspan="1">
+                    {% if part["Time"] is not none %}
+                        <span class="total-duration">{{ part["Time"] }}</span>s
+                    {% else %}
+                        {{ part["Time"]|replace('None', '') }}
+                    {% endif %}
+                </td>
+                <td class="colored {{part['Result']|lower}}" colspan="1">{{ part["Result"]|replace('None', '') }}</td>
+            </tr>
+            {% else %} {% if part[Step] != " " %}
+            <td colspan="3">
+                {% set step_parts = part["Step"].split('\n', 1) %} {{
+                step_parts[0]|replace("--------------------------------------------------------------------------------",
+                "") }} {% if step_parts|length > 1 %}
+                <button class="toggle-details">&#9660;</button>
+                <!-- Pijltje naar beneden -->
+                <span class="hidden more-details">{{
+                    step_parts[1]|replace("--------------------------------------------------------------------------------",
+                    "") }}</span>
+                {% endif %}
+            </td>
+            {% endif %} {% endif %} {% endfor %} {% endfor %}
+        </tbody>
+    </table>
+    <!-- Jquery as JavaScript library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- chart.js to build pie chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // template data imported from XML to HTML trough jinja2
+        var count_failed = {{ count_failed }};
+        var count_passed = {{ count_passed }};
+        var count_skipped = {{ count_skipped }};
+        var count_expected_failures = {{ count_expected_failures }};
+        var count_unexpected_passes = {{ count_unexpected_passes }};
+        var count_errors = {{ count_errors }};
+        var count_reruns = {{ count_reruns }};
+        var count_nostatus = {{ count_nostatus }};
+    </script>
+    <!-- our JavaScript file -->
+    <script src="public/script.js"></script>
+</body>
+
+</html>
